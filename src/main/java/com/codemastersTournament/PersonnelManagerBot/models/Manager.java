@@ -1,75 +1,30 @@
 package com.codemastersTournament.PersonnelManagerBot.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
+import lombok.Data;
 import java.sql.Timestamp;
 
 @Entity
+@Data
 @Table(name = "Manager")
 public class Manager {
     @Id
-    @Column(name = "chatId")
+    @Column(name = "chat_id")
     private Long chatId;
-
-    @Column(name = "firstName")
-    private String firstName;
-
-    @Column(name = "lastName")
+    @Column(name = "name")
+    private String name;
+    @Column(name = "patronymic")
+    private String patronymic;
+    @Column(name = "last_name")
     private String lastName;
+    @Column(name = "position")
+    private String position;
+    @Column(name = "project")
+    private String project;
+    @Lob
+    @Column(name = "avatar", columnDefinition = "oid")
+    private byte[] avatar;
+    @Column(name = "arrival_date")
+    private Timestamp arrivalDate;
 
-    @Column(name = "userName")
-    private String userName;
-
-    @Column(name = "registeredAt")
-    private Timestamp registeredAt;
-    public Manager(){}
-    public Manager(Long chatId, String firstName, String lastName, String userName) {
-        this.chatId = chatId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userName = userName;
-    }
-
-    public Long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(Long chatId) {
-        this.chatId = chatId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Timestamp getRegisteredAt() {
-        return registeredAt;
-    }
-
-    public void setRegisteredAt(Timestamp registeredAt) {
-        this.registeredAt = registeredAt;
-    }
 }
