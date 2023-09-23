@@ -86,7 +86,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
         rowsInLine.add(generateButtonVertical("Добавить сотрудника ✅", "ADD_EMPLOYEE"));
         rowsInLine.add(generateButtonVertical("Удалить сотрудника ❌", "DELETE_EMPLOYEE"));
-        rowsInLine.add(generateButtonVertical("Редоктировать информацию о \n" + "сотруднике ✍\uFE0F", "EDIT_EMPLOYEE_INFORMATION"));
+        rowsInLine.add(generateButtonVertical("Открыть карточку сотрудника ✍\uFE0F", "EDIT_EMPLOYEE_INFORMATION"));
         rowsInLine.add(generateButtonVertical("Поиск сотрудника \uD83D\uDD0D", "SEARCH_EMPLOYEE"));
         markupInLine.setKeyboard(rowsInLine);
         return markupInLine;

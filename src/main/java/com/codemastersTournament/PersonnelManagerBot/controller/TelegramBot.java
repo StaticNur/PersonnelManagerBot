@@ -42,6 +42,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         listOfCommand.add(new BotCommand("/add","Добавить сотрудника"));
         listOfCommand.add(new BotCommand("/delete","Удалить сотрудника"));
         listOfCommand.add(new BotCommand("/edit","Редактировать данные сотрудника"));
+        listOfCommand.add(new BotCommand("/search","Поиск сотрудника"));
         listOfCommand.add(new BotCommand("/info","Информация о боте"));
         SetMyCommands setMyCommands = new SetMyCommands();
         setMyCommands.setCommands(listOfCommand);

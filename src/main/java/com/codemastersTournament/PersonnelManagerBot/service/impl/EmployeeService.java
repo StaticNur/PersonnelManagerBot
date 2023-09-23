@@ -3,6 +3,7 @@ package com.codemastersTournament.PersonnelManagerBot.service.impl;
 import com.codemastersTournament.PersonnelManagerBot.models.Employee;
 import com.codemastersTournament.PersonnelManagerBot.repository.EmployeeRepository;
 import jakarta.ws.rs.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,11 @@ public class EmployeeService {
         if(lines.length == 1){//Иванов Иван|дизайнер|магазин курток
             String[] str = info.split("\\|");
             String[] fullName = str[0].split(" ");
+            /*if (StringUtils.containsAny(str, "0123456789")) {
+                System.out.println("Строка содержит числа.");
+            } else {
+                System.out.println("Строка не содержит числа.");
+            }*/
             employee.setName(fullName[1]);
             employee.setLastName(fullName[0]);
             employee.setPosition(str[1]);
