@@ -3,13 +3,15 @@ package com.codemastersTournament.PersonnelManagerBot.service.impl;
 import com.codemastersTournament.PersonnelManagerBot.models.Employee;
 import com.codemastersTournament.PersonnelManagerBot.repository.EmployeeRepository;
 import jakarta.ws.rs.NotFoundException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,7 +23,7 @@ public class EmployeeService {
     }
 
     @Transactional
-    public void addEmployee(String info){
+    public Employee addEmployee(String info){
         Employee employee = new Employee();
         String[] lines = info.trim().split("\n");
         if(lines.length == 1){//Иванов Иван|дизайнер|магазин курток
@@ -52,7 +54,7 @@ public class EmployeeService {
         byte[] imageBytes = Base64.getDecoder().decode(base64Data);
         employee.setAvatar(imageBytes);
 
-        employeeRepository.save(employee);
+        return employeeRepository.save(employee);
     }
     @Transactional
     public void deleteEmployee(Employee employee){

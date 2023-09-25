@@ -2,6 +2,7 @@ package com.codemastersTournament.PersonnelManagerBot.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.sql.Timestamp;
 
 @Entity

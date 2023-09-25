@@ -3,6 +3,7 @@ package com.codemastersTournament.PersonnelManagerBot.service.impl;
 import com.codemastersTournament.PersonnelManagerBot.models.Employee;
 import com.codemastersTournament.PersonnelManagerBot.repository.EmployeeRepository;
 import com.codemastersTournament.PersonnelManagerBot.service.AnswerConsumer;
+import com.codemastersTournament.PersonnelManagerBot.utils.Consts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,37 +21,6 @@ import java.util.List;
 
 @Service
 public class AnswerConsumerImpl implements AnswerConsumer {
-    private final String TEXT_MESSAGE_ADD = "Введите фамилию, имя, должность \n" +
-            "и проект над которым работает этот \n" +
-            "сотрудника.\n\n" +
-            "Например: \n" +
-            "Иванов Иван\n" +
-            "UI дизайнера\n" +
-            "магазин курток \n\n" +
-            "Например: \n" +
-            "Иванов Иван|дизайнер|магазин курток \n\n" +
-            "Другие команды не обрабатываются❗\uFE0F❗\uFE0F❗\uFE0F";
-    private final String TEXT_MESSAGE_SEARCH = "Введите имя и/или фамилию сотрудника (регистр не учитывается)\n\n" +
-            "пример 1:\n" +
-            "Иванов Иван \n\n" +
-            "пример 2:\n" +
-            "Иванов \n\n" +
-            "пример 3:\n" +
-            "Иван \n\n" +
-            "Другие команды не обрабатываются❗\uFE0F❗\uFE0F❗\uFE0F";
-    private final String TEXT_MESSAGE_INFO = "Информация о боте: \n" +
-            "1. Пользователи имеют возможность добавлять нового сотрудника, указав поля\n" +
-            "     Фамилия, Имя, Должность, Проект.\n" +
-            "2. Пользователи имеют возможность удалять сотрудника посредством команды\n" +
-            "     бота (кнопка “удалить” в карточка сотрудника).\n" +
-            "3. Пользователи имеют возможность редактировать информацию о сотруднике\n" +
-            "     (Фамилия, Имя, Отчество, Должность, Проект, Аватарка).\n" +
-            "4. Пользователи имеют возможность осуществить поиск сотрудника\n" +
-            "     по имени и/или фамилии.\n\n" +
-            "Поля Фамилия, Имя, Должность, Проект – обязательны для заполнения при создании сотрудника.\n\n" +
-            "Карточка сотрудника содержит информацию (Имя, Отчество, Фамилия, Должность, Проект, Аватарка, Дата прихода).\n\n" +
-            "Поиск не учитывает регистр.\n\n" +
-            "Результат поиска умеет обрабатывать результат выдачи с однофамильцами.\n\n По всем вопросам пишите: @orifov_nur";
     private final EmployeeRepository employeeRepository;
 
     @Autowired
@@ -85,8 +56,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
         rowsInLine.add(generateButtonVertical("Добавить сотрудника ✅", "ADD_EMPLOYEE"));
-        rowsInLine.add(generateButtonVertical("Удалить сотрудника ❌", "DELETE_EMPLOYEE"));
-        rowsInLine.add(generateButtonVertical("Открыть карточку сотрудника ✍\uFE0F", "EDIT_EMPLOYEE_INFORMATION"));
+        rowsInLine.add(generateButtonVertical("Открыть карточку сотрудника ✍\uFE0F", "OPEN_CARD_EMPLOYEE"));
         rowsInLine.add(generateButtonVertical("Поиск сотрудника \uD83D\uDD0D", "SEARCH_EMPLOYEE"));
         markupInLine.setKeyboard(rowsInLine);
         return markupInLine;
@@ -94,7 +64,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
 
     public SendMessage generateNewAddCommandMessage(Long chatId) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setText(TEXT_MESSAGE_ADD);
+        sendMessage.setText(Consts.TEXT_MESSAGE_ADD);
         sendMessage.setChatId(chatId);
 
         sendMessage.setReplyMarkup(generateButtonBack());
@@ -105,7 +75,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         EditMessageText message = new EditMessageText();
         message.setMessageId(messageId);
         message.setChatId(String.valueOf(chatId));
-        message.setText(TEXT_MESSAGE_ADD);
+        message.setText(Consts.TEXT_MESSAGE_ADD);
 
         message.setReplyMarkup(generateButtonBack());
         return message;
@@ -114,7 +84,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
     public SendMessage generateNewInfoMessage(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(TEXT_MESSAGE_INFO);
+        message.setText(Consts.TEXT_MESSAGE_INFO);
 
         message.setReplyMarkup(generateButtonBack());
         return message;
@@ -189,7 +159,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
     public SendMessage generateNewSearchCommandMessage(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(TEXT_MESSAGE_SEARCH);
+        message.setText(Consts.TEXT_MESSAGE_SEARCH);
         message.setReplyMarkup(generateButtonBack());
         return message;
     }
@@ -197,7 +167,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         EditMessageText message = new EditMessageText();
         message.setMessageId(messageId);
         message.setChatId(String.valueOf(chatId));
-        message.setText(TEXT_MESSAGE_SEARCH);
+        message.setText(Consts.TEXT_MESSAGE_SEARCH);
 
         message.setReplyMarkup(generateButtonBack());
         return message;

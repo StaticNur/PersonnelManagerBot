@@ -1,34 +1,17 @@
 package com.codemastersTournament.PersonnelManagerBot.controller;
 
-import com.codemastersTournament.PersonnelManagerBot.models.Employee;
-import com.codemastersTournament.PersonnelManagerBot.service.impl.EmployeeService;
-import com.codemastersTournament.PersonnelManagerBot.service.impl.ManagerService;
-import com.codemastersTournament.PersonnelManagerBot.service.impl.AnswerConsumerImpl;
-import com.codemastersTournament.PersonnelManagerBot.utils.MessageUtils;
-import com.codemastersTournament.PersonnelManagerBot.utils.enums.BotState;
-import jakarta.ws.rs.NotFoundException;
 import lombok.extern.log4j.Log4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import static com.codemastersTournament.PersonnelManagerBot.utils.enums.BotState.*;
 
 @Log4j
 @Component
 public class UpdateProcessor {
-    private TelegramBot telegramBot;
+    /*private TelegramBot telegramBot;
     private final MessageUtils messageUtils;
     private final AnswerConsumerImpl answerConsumer;
     private final ManagerService managerService;
     private final EmployeeService employeeService;
-    private final Map<Long, BotState> managerStates = new HashMap<>();
+    private final Map<Long, BotInputState> managerStates = new HashMap<>();
 
     @Autowired
     public UpdateProcessor(MessageUtils messageUtils, AnswerConsumerImpl answerConsumer,
@@ -52,7 +35,7 @@ public class UpdateProcessor {
             System.out.println("Нажимаем на кнопки");
             processCallbackQuery(update);
         }else if (update.hasMessage()) {
-            System.out.println("Вводим ");
+            System.out.println("Отправка сообщения ");
             distributeMessagesByType(update);
         } else {
             log.error("Получен неподдерживаемый тип сообщения: " + update);
@@ -104,13 +87,13 @@ public class UpdateProcessor {
     private void processPhotoMessage(Update update) {
         Long chatId = update.getMessage().getChatId();
 
-        Map.Entry<Long, BotState> valueManagerStates;
+        Map.Entry<Long, BotInputState> valueManagerStates;
         Long idEmployee = null;
         if(!managerStates.isEmpty()){
             valueManagerStates = managerStates.entrySet().iterator().next(); // Получаем первую запись из HashMap
             idEmployee = valueManagerStates.getKey();
         }
-        BotState currentState = managerStates.getOrDefault(idEmployee, BotState.START);// Проверяем текущее состояние пользователя
+        BotInputState currentState = managerStates.getOrDefault(idEmployee, OPEN_CARD);// Проверяем текущее состояние пользователя
         if(currentState.equals(WAITING_FOR_EMPLOYEE_DATA_FOR_EDIT_AVATAR)) {
             byte[] photoByte;
             try {
@@ -140,7 +123,7 @@ public class UpdateProcessor {
         var messageId = update.getMessage().getMessageId();
         Long chatId = update.getMessage().getChatId();
 
-        Map.Entry<Long, BotState> valueManagerStates;
+        Map.Entry<Long, BotInputState> valueManagerStates;
         Long idEmployee = null;
         if(!managerStates.isEmpty()){
             valueManagerStates = managerStates.entrySet().iterator().next(); // Получаем первую запись из HashMap
@@ -210,7 +193,7 @@ public class UpdateProcessor {
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        Map.Entry<Long, BotState> valueManagerStates;
+        Map.Entry<Long, BotInputState> valueManagerStates;
         Long idEmployee = null;
         if(!managerStates.isEmpty()){
             valueManagerStates = managerStates.entrySet().iterator().next(); // Получаем первую запись из HashMap
@@ -287,13 +270,13 @@ public class UpdateProcessor {
         Long chatId = update.getMessage().getChatId();
         String messageText = update.getMessage().getText();
 
-        Map.Entry<Long, BotState> valueManagerStates;
+        Map.Entry<Long, BotInputState> valueManagerStates;
         Long idEmployee = null;
         if(!managerStates.isEmpty()){
             valueManagerStates = managerStates.entrySet().iterator().next(); // Получаем первую запись из HashMap
             idEmployee = valueManagerStates.getKey();
         }
-        BotState currentState = managerStates.getOrDefault(idEmployee, BotState.START);
+        BotInputState currentState = managerStates.getOrDefault(idEmployee, OPEN_CARD);
         switch (currentState) {
             case WAITING_FOR_EMPLOYEE_DATA_FOR_ADD:
                 try {
@@ -335,7 +318,7 @@ public class UpdateProcessor {
                     Employee employee = employeeService.searchEmployeeByFirstOrLastName(update.getMessage().getText()).get(0); //для отображения карточки первого пользователья
                     sendCardAfterEdit(chatId,employee.getId());
                     managerStates.clear();
-                    managerStates.put(employee.getId(), START);
+                    //managerStates.put(employee.getId(), START);
                 }catch (NotFoundException e){
                     setNewMessageView(new SendMessage(chatId.toString(),"Такого сотрудника нет."));
                     setNewMessageView(answerConsumer.generateNewMenuCommandMessage(chatId));
@@ -383,5 +366,5 @@ public class UpdateProcessor {
         sendMessage.setChatId(chatId.toString());
         sendMessage.setText(text);
         setNewMessageView(sendMessage);
-    }
+    }*/
 }
