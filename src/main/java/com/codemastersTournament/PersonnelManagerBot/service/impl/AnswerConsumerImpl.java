@@ -4,15 +4,16 @@ import com.codemastersTournament.PersonnelManagerBot.models.Employee;
 import com.codemastersTournament.PersonnelManagerBot.repository.EmployeeRepository;
 import com.codemastersTournament.PersonnelManagerBot.service.AnswerConsumer;
 import com.codemastersTournament.PersonnelManagerBot.utils.Consts;
+import com.codemastersTournament.PersonnelManagerBot.utils.StateForEmployeeData;
+import com.codemastersTournament.PersonnelManagerBot.utils.enums.Role;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,36 +34,41 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         return sendMessage;
     }
 
-    public SendMessage generateNewMenuCommandMessage(Long chatId) {
+    public SendMessage generateMenu(Long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText("Количество сотрудников: " + employeeRepository.findAll().size());
 
-        sendMessage.setReplyMarkup(generateButtonMenu());
+        if(StateForEmployeeData.role == Role.ADMIN){
+            sendMessage.setReplyMarkup(generateAdminButtonMenu());
+        }else if(StateForEmployeeData.role == Role.USER){
+            sendMessage.setReplyMarkup(generateUserButtonMenu());
+        }
         return sendMessage;
     }
-
-    public EditMessageText generateEditMenuCommandMessage(Long chatId, Integer messageId) {
-        EditMessageText message = new EditMessageText();
-        message.setMessageId(messageId);
-        message.setChatId(String.valueOf(chatId));
-        message.setText("Количество сотрудников: " + employeeRepository.findAll().size());
-
-        message.setReplyMarkup(generateButtonMenu());
-        return message;
-    }
-
-    private InlineKeyboardMarkup generateButtonMenu() {
+    private InlineKeyboardMarkup generateAdminButtonMenu() {
         InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
         rowsInLine.add(generateButtonVertical("Добавить сотрудника ✅", "ADD_EMPLOYEE"));
         rowsInLine.add(generateButtonVertical("Открыть карточку сотрудника ✍\uFE0F", "OPEN_CARD_EMPLOYEE"));
-        rowsInLine.add(generateButtonVertical("Поиск сотрудника \uD83D\uDD0D", "SEARCH_EMPLOYEE"));
+        rowsInLine.add(generateButtonVertical("Поиск сотрудника по ФИО \uD83D\uDD0D", "SEARCH_EMPLOYEE"));
+        rowsInLine.add(generateButtonVertical("Все сотрудники \uD83D\uDC40", "VIEW_ALL"));
+        markupInLine.setKeyboard(rowsInLine);
+        return markupInLine;
+    }
+    private InlineKeyboardMarkup generateUserButtonMenu() {
+        InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        rowsInLine.add(generateButtonVertical("Искать по должности \uD83D\uDD0D", "SEARCH_EMPLOYEE_BY_POSITION"));
+        rowsInLine.add(generateButtonVertical("Искать по дате прибытия \uD83D\uDD0D", "SEARCH_EMPLOYEE_BY_DATE"));
+        rowsInLine.add(generateButtonVertical("Искать по проекту \uD83D\uDD0D", "SEARCH_EMPLOYEE_BY_PROJECT"));
+        rowsInLine.add(generateButtonVertical("Найти список по проекту \uD83D\uDD0D", "SEARCH_EMPLOYEE_BY_PROJECT_LIST"));
+        rowsInLine.add(generateButtonVertical("Найти список по должности \uD83D\uDD0D", "SEARCH_EMPLOYEE_BY_POSITION_LIST"));
         markupInLine.setKeyboard(rowsInLine);
         return markupInLine;
     }
 
-    public SendMessage generateNewAddCommandMessage(Long chatId) {
+    public SendMessage generateAddCommandMessage(Long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(Consts.TEXT_MESSAGE_ADD);
         sendMessage.setChatId(chatId);
@@ -71,17 +77,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         return sendMessage;
     }
 
-    public EditMessageText generateEditAddCommandMessage(Long chatId, Integer messageId) {
-        EditMessageText message = new EditMessageText();
-        message.setMessageId(messageId);
-        message.setChatId(String.valueOf(chatId));
-        message.setText(Consts.TEXT_MESSAGE_ADD);
-
-        message.setReplyMarkup(generateButtonBack());
-        return message;
-    }
-
-    public SendMessage generateNewInfoMessage(Long chatId) {
+    public SendMessage generateInfoMessage(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(Consts.TEXT_MESSAGE_INFO);
@@ -90,6 +86,9 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         return message;
     }
     public SendMessage generateListEmployMessage(Long chatId, List<Employee> employeeList) {
+        if(employeeList.isEmpty()){
+            throw new NotFoundException();
+        }
         SendMessage sendMessage = new SendMessage();
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("Результаты поиска: \n");
@@ -114,7 +113,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         sendMessage.setReplyMarkup(generateButtonBack());
         return sendMessage;
     }
-    public SendPhoto sendNewPhoto(Long chatId, Employee employee){
+    public SendPhoto sendPhoto(Long chatId, Employee employee){
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(String.valueOf(chatId));
 
@@ -139,7 +138,9 @@ public class AnswerConsumerImpl implements AnswerConsumer {
                 "\nдолжность: " +employee.getPosition()+
                 "\nпроект: " +employee.getProject()+
                 "\nдата прихода: "+formattedDate);
-        sendMessage.setReplyMarkup(generateButtonCardEmployee());
+        if(StateForEmployeeData.role == Role.ADMIN){
+            sendMessage.setReplyMarkup(generateButtonCardEmployee());
+        }
         return sendMessage;
     }
     private InlineKeyboardMarkup generateButtonCardEmployee() {
@@ -156,24 +157,35 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         markupInLine.setKeyboard(rowsInLine);
         return markupInLine;
     }
-    public SendMessage generateNewSearchCommandMessage(Long chatId) {
+    public SendMessage generateSearchByFIOMessage(Long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(Consts.TEXT_MESSAGE_SEARCH);
+        message.setText(Consts.TEXT_MESSAGE_SEARCH_BY_FIO);
         message.setReplyMarkup(generateButtonBack());
         return message;
     }
-    public EditMessageText generateEditSearchCommandMessage(Long chatId, Integer messageId) {
-        EditMessageText message = new EditMessageText();
-        message.setMessageId(messageId);
+    public SendMessage generateSearchByProjectMessage(Long chatId) {
+        SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(Consts.TEXT_MESSAGE_SEARCH);
-
+        message.setText(Consts.TEXT_MESSAGE_SEARCH_BY_PROJECT);
         message.setReplyMarkup(generateButtonBack());
         return message;
     }
-
-    private InlineKeyboardMarkup generateButtonBack() {
+    public SendMessage generateSearchByPositionMessage(Long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(Consts.TEXT_MESSAGE_SEARCH_BY_POSITION);
+        message.setReplyMarkup(generateButtonBack());
+        return message;
+    }
+    public SendMessage generateSearchByDateMessage(Long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(Consts.TEXT_MESSAGE_SEARCH_BY_DATE);
+        message.setReplyMarkup(generateButtonBack());
+        return message;
+    }
+    public static InlineKeyboardMarkup generateButtonBack() {
         InlineKeyboardMarkup markupInLine = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
         rowsInLine.add(generateButtonVertical("«Назад\uFE0F", "BACK"));
@@ -181,7 +193,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         return markupInLine;
     }
 
-    private List<InlineKeyboardButton> generateButtonVertical(String textButton, String callbackData) {
+    public static List<InlineKeyboardButton> generateButtonVertical(String textButton, String callbackData) {
         List<InlineKeyboardButton> rowInLine = new ArrayList<>();
         var addButton = new InlineKeyboardButton();
         addButton.setText(textButton);

@@ -1,5 +1,6 @@
 package com.codemastersTournament.PersonnelManagerBot.controller.callbacks;
 
+import com.codemastersTournament.PersonnelManagerBot.controller.sender.SubmittingAdditionalMessage;
 import com.codemastersTournament.PersonnelManagerBot.utils.Consts;
 import com.codemastersTournament.PersonnelManagerBot.utils.enums.ButtonCallBackQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +15,36 @@ import java.util.Map;
 public class CallbacksHandler {
 
     private final Map<ButtonCallBackQuery, CallbackHandler> callbacks;
+    private final SubmittingAdditionalMessage message;
     public CallbacksHandler(@Autowired AddChooseCallback addChooseCallback,
                             @Autowired DeleteChooseCallback deleteChooseCallback,
                             @Autowired OpenCardChooseCallback openCardChooseCallback,
-                            @Autowired SearchChooseCallback searchChooseCallback,
+                            @Autowired SearchByFIOChooseCallback searchByFIOChooseCallback,
+                            @Autowired SearchByProjectChooseCallback searchByProjectChooseCallback,
+                            @Autowired SearchByPositionChooseCallback searchByPositionChooseCallback,
+                            @Autowired SearchByProjectListChooseCallback searchByProjectListChooseCallback,
+                            @Autowired SearchByPositionListChooseCallback searchByPositionListChooseCallback,
+                            @Autowired SearchByDateChooseCallback searchByDateChooseCallback,
+                            @Autowired ViewAllChooseCallback viewAllChooseCallback,
                             @Autowired BackChooseCallback backChooseCallback,
                             @Autowired ChangeNameChooseCallback changeNameChooseCallback,
                             @Autowired ChangePatronymicChooseCallback changePatronymicChooseCallback,
                             @Autowired ChangeLastNameChooseCallback changeLastNameChooseCallback,
                             @Autowired ChangePositionChooseCallback changePositionChooseCallback,
                             @Autowired ChangeProjectChooseCallback changeProjectChooseCallback,
-                            @Autowired ChangeAvatarChooseCallback avatarChooseCallback) {
+                            @Autowired ChangeAvatarChooseCallback avatarChooseCallback, SubmittingAdditionalMessage message) {
+        this.message = message;
         this.callbacks = new HashMap<>();
         this.callbacks.put(ButtonCallBackQuery.ADD_EMPLOYEE, addChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.DELETE_EMPLOYEE, deleteChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.OPEN_CARD_EMPLOYEE, openCardChooseCallback);
-        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE, searchChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE_BY_FIO, searchByFIOChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE_BY_PROJECT, searchByProjectChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE_BY_POSITION, searchByPositionChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE_BY_PROJECT_LIST, searchByProjectListChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE_BY_POSITION_LIST, searchByPositionListChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.SEARCH_EMPLOYEE_BY_DATE, searchByDateChooseCallback);
+        this.callbacks.put(ButtonCallBackQuery.VIEW_ALL, viewAllChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.BACK, backChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.CHANGE_NAME, changeNameChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.CHANGE_PATRONYMIC, changePatronymicChooseCallback);
@@ -39,22 +54,20 @@ public class CallbacksHandler {
         this.callbacks.put(ButtonCallBackQuery.CHANGE_AVATAR, avatarChooseCallback);
 
     }
-    public SendMessage handleCallbacks(Update update) {
+    public void handleCallbacks(Update update) {
         String dataCallback = update.getCallbackQuery().getData();
         long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        SendMessage answer;
         if (dataCallback.isEmpty()) {
-            answer = new SendMessage(String.valueOf(chatId), Consts.ERROR);
+             message.sendMessage(new SendMessage(String.valueOf(chatId), Consts.ERROR));
         } else {
             Callback callback = Callback.builder()
                     .buttonCallBackQuery(ButtonCallBackQuery.valueOf(dataCallback))
                     .data(dataCallback)
                     .build();
             CallbackHandler callbackBiFunction = callbacks.get(callback.getButtonCallBackQuery());
-            answer = callbackBiFunction.apply(callback, update);
+            callbackBiFunction.apply(callback, update);
         }
-        return answer;
     }
 
 }

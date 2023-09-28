@@ -42,7 +42,7 @@ public class EditProjectEmployee implements Input {
     }
     private void sendCardAfterEdit(Long chatId, Long id) {
         Employee employeeAfterChanger = employeeService.searchEmployeeById(id);
-        message.sendMessage(answerConsumer.sendNewPhoto(chatId, employeeAfterChanger));
+        message.sendMessage(answerConsumer.sendPhoto(chatId, employeeAfterChanger));
         message.sendMessage(answerConsumer.generateEmployCard(chatId, employeeAfterChanger));
 
         StateForEmployeeData.stateAndCard.clear();

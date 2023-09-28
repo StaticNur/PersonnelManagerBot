@@ -1,5 +1,7 @@
 package com.codemastersTournament.PersonnelManagerBot.controller.commands;
 
+import com.codemastersTournament.PersonnelManagerBot.controller.sender.SubmittingAdditionalMessage;
+import com.codemastersTournament.PersonnelManagerBot.service.impl.AnswerConsumerImpl;
 import com.codemastersTournament.PersonnelManagerBot.utils.Consts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,26 +15,40 @@ import java.util.Map;
 @Slf4j
 public class CommandsHandler {
     private final Map<String, Command> commands;
+    private final SubmittingAdditionalMessage message;
     public CommandsHandler(@Autowired StartCommand startCommand,
-                           @Autowired StopCommand stopCommand,
+                           /*@Autowired StopCommand stopCommand,
                            @Autowired InfoCommand infoCommand,
-                           @Autowired MenuCommand menuCommand) {
-        this.commands = Map.of(
-                "/start", startCommand,
+                           @Autowired MenuCommand menuCommand,*/
+                            @Autowired AdminCommand adminCommand,
+                            @Autowired UserCommand userCommand,
+                            @Autowired InfoCommand infoCommand,
+                            @Autowired StopCommand stopCommand,
+                           SubmittingAdditionalMessage message) {
+        this.message = message;
+        this.commands = Map.of("/admin", adminCommand,
+                "/user", userCommand,
+                "/info", infoCommand,
+                "/stop", stopCommand,
+                "/start", startCommand
+                /*
                 "/stop", stopCommand,
                 "/info", infoCommand,
-                "/menu", menuCommand
+                "/menu", menuCommand*/
         );
     }
-    public SendMessage handleCommands(Update update) {
+    public void handleCommands(Update update) {
         String messageText = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
 
         var commandHandler = commands.get(messageText);
         if (commandHandler != null) {
-            return commandHandler.apply(update);
+            commandHandler.apply(update);
         } else {
-            return new SendMessage(String.valueOf(chatId), Consts.CANT_UNDERSTAND);
+            var error = new SendMessage(String.valueOf(chatId), Consts.CANT_UNDERSTAND);
+            var buttonBack = AnswerConsumerImpl.generateButtonBack();
+            error.setReplyMarkup(buttonBack);
+            message.sendMessage(error);
         }
     }
 }

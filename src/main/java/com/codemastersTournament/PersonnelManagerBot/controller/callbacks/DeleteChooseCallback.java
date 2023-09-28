@@ -26,7 +26,7 @@ public class DeleteChooseCallback implements CallbackHandler{
         this.message = message;
     }
     @Override
-    public SendMessage apply(Callback callback, Update update) {
+    public void apply(Callback callback, Update update) {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
 
         Map.Entry<BotInputState, Employee> stateForEmployeeData = StateForEmployeeData.stateAndCard.entrySet().iterator().next();
@@ -34,6 +34,7 @@ public class DeleteChooseCallback implements CallbackHandler{
         employeeService.deleteEmployee(employee);
 
         message.sendMessage(new SendMessage(chatId.toString(),"Сотрудник успешно удален."));
-        return answerConsumer.generateNewMenuCommandMessage(chatId);
+        //return answerConsumer.generateNewMenuCommandMessage(chatId);
+        message.sendMessage(answerConsumer.generateMenu(chatId));
     }
 }

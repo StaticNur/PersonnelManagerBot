@@ -4,13 +4,18 @@ import com.codemastersTournament.PersonnelManagerBot.controller.callbacks.Callba
 import com.codemastersTournament.PersonnelManagerBot.controller.commands.CommandsHandler;
 import com.codemastersTournament.PersonnelManagerBot.controller.enter_data.InputHandler;
 import com.codemastersTournament.PersonnelManagerBot.controller.sender.SubmittingAdditionalMessage;
+import com.codemastersTournament.PersonnelManagerBot.models.Employee;
+import com.codemastersTournament.PersonnelManagerBot.service.impl.AnswerConsumerImpl;
+import com.codemastersTournament.PersonnelManagerBot.utils.Consts;
 import com.codemastersTournament.PersonnelManagerBot.utils.MessageUtils;
 import com.codemastersTournament.PersonnelManagerBot.utils.StateForEmployeeData;
+import com.codemastersTournament.PersonnelManagerBot.utils.enums.BotInputState;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.Map;
 
 @Log4j
 @Component
@@ -28,16 +33,15 @@ public class HandlerUpdate {
         this.message = message;
         this.messageUtils = messageUtils;
     }
+
     public void processUpdate(Update update) {
         if (update == null) {
             log.error("Полученное сообщение пустое");
             return;
         }
         if (update.hasCallbackQuery()) {
-            System.out.println("Нажимаем на кнопки");
-            setAnswerMessage(callbacksHandler.handleCallbacks(update));
+            callbacksHandler.handleCallbacks(update);
         } else if (update.hasMessage()) {
-            System.out.println("Отправка сообщения ");
             distributeMessagesByType(update);
         } else {
             log.error("Получен неподдерживаемый тип сообщения: " + update);
@@ -47,34 +51,62 @@ public class HandlerUpdate {
     private void distributeMessagesByType(Update update) {
         var message = update.getMessage();
         if (message.hasText()) {
-            if (message.hasText() && (!StateForEmployeeData.stateAndCard.isEmpty())) {
-                System.out.println("Вводим данные пользователья");
-                setAnswerMessage(inputHandler.handleInputs(update));
-            } else {
-                System.out.println("Вводим какую-то команду: /command");
-                setAnswerMessage(commandsHandler.handleCommands(update));
-            }
-        } else if (message.hasPhoto() && (!StateForEmployeeData.stateAndCard.isEmpty())) {
-            System.out.println("отправляем photo");
-            setAnswerMessage(inputHandler.handleInputs(update));
+            checkTextCommandProcess(update);
+        } else if (message.hasPhoto()) {
+            checkPhotoCommandProcess(update);
         } else if (message.hasDocument()) {
-            System.out.println("отправляем Document");
             setFileIsReceivedView(update);
         } else {
             setUnsupportedMessageTypeView(update);
         }
     }
-    public void setAnswerMessage(SendMessage sendMessage) {
-        message.sendMessage(sendMessage);
+
+    private void checkTextCommandProcess(Update update){
+        System.out.println("Вводим");
+        if(update.getMessage().getText().startsWith("/")){
+            commandsHandler.handleCommands(update);
+        }else {
+            Map.Entry<BotInputState, Employee> stateForEmployeeData = StateForEmployeeData.stateAndCard.entrySet().iterator().next();
+            System.out.println("Вводим данные "+stateForEmployeeData.getValue().getId());//заместо id мог быть любое объязательное поля
+            if (stateForEmployeeData.getValue().getId() == null) {
+                System.out.println("Вводим данные пользователья");
+                inputHandler.handleInputs(update);
+            }else {//внутри карточки вводим что-то, без команд и кнопок
+                setUnsupportedMessageTypeView(update);
+            }
+        }
     }
-    private void setUnsupportedMessageTypeView(Update update) {
-        var sendMessage = messageUtils.generateSendMessageWithText(update,
-                "Неподдерживаемый тип сообщения!");
-        setAnswerMessage(sendMessage);
+
+    private void checkPhotoCommandProcess(Update update){
+        if(!StateForEmployeeData.stateAndCard.isEmpty()){
+            Map.Entry<BotInputState, Employee> stateForEmployeeData = StateForEmployeeData.stateAndCard.entrySet().iterator().next();
+            if (stateForEmployeeData.getValue() == null) {
+                System.out.println("Вводим данные пользователья");
+                inputHandler.handleInputs(update);
+            }else {//внутри карточки отправляем что-то, без команд и кнопок
+                setUnsupportedMessageTypeView(update);
+            }
+        }else {
+            generateAndSendMessageError(update,Consts.ERROR_PHOTO);
+        }
     }
     private void setFileIsReceivedView(Update update) {
-        var sendMessage = messageUtils.generateSendMessageWithText(update,
-                "Сообщения в виде файлов не обрабатываются!");
-        setAnswerMessage(sendMessage);
+        /*System.out.println(update.getMessage().getDocument().getFileName());
+        String nameFile = update.getMessage().getDocument().getFileName();
+        String format = nameFile.split(".")[0];
+        System.out.println(format);*/
+        generateAndSendMessageError(update,Consts.ERROR_FILE);
     }
+
+    private void setUnsupportedMessageTypeView(Update update) {
+        generateAndSendMessageError(update,Consts.CANT_UNDERSTAND);
+    }
+
+    private void generateAndSendMessageError(Update update, String messageError){
+        var error = messageUtils.generateSendMessageWithText(update, messageError);
+        var buttonBack = AnswerConsumerImpl.generateButtonBack();
+        error.setReplyMarkup(buttonBack);
+        message.sendMessage(error);
+    }
+
 }

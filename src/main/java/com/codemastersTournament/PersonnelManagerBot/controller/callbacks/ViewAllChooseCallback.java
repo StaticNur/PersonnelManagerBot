@@ -3,27 +3,28 @@ package com.codemastersTournament.PersonnelManagerBot.controller.callbacks;
 import com.codemastersTournament.PersonnelManagerBot.controller.sender.SubmittingAdditionalMessage;
 import com.codemastersTournament.PersonnelManagerBot.models.Employee;
 import com.codemastersTournament.PersonnelManagerBot.service.impl.AnswerConsumerImpl;
-import com.codemastersTournament.PersonnelManagerBot.utils.StateForEmployeeData;
-import com.codemastersTournament.PersonnelManagerBot.utils.enums.BotInputState;
+import com.codemastersTournament.PersonnelManagerBot.service.impl.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.List;
+
 @Component
-public class OpenCardChooseCallback implements CallbackHandler{
+public class ViewAllChooseCallback implements CallbackHandler{
     private final AnswerConsumerImpl answerConsumer;
+    private final EmployeeService employeeService;
     private final SubmittingAdditionalMessage message;
     @Autowired
-    public OpenCardChooseCallback(AnswerConsumerImpl answerConsumer, SubmittingAdditionalMessage message) {
+    public ViewAllChooseCallback(AnswerConsumerImpl answerConsumer, EmployeeService employeeService, SubmittingAdditionalMessage message) {
         this.answerConsumer = answerConsumer;
+        this.employeeService = employeeService;
         this.message = message;
     }
     @Override
     public void apply(Callback callback, Update update) {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        StateForEmployeeData.stateAndCard.clear();
-        StateForEmployeeData.stateAndCard.put(BotInputState.OPEN_CARD,new Employee());
-
-        //return answerConsumer.generateNewSearchCommandMessage(chatId);
-        message.sendMessage(answerConsumer.generateSearchByFIOMessage(chatId));
+        List<Employee> listEmployView = employeeService.viewAll();
+        message.sendMessage(answerConsumer.generateListEmployMessage(chatId, listEmployView));
     }
 }

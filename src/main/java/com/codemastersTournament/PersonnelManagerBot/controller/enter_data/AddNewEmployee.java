@@ -1,6 +1,5 @@
 package com.codemastersTournament.PersonnelManagerBot.controller.enter_data;
 
-import com.codemastersTournament.PersonnelManagerBot.controller.callbacks.CallbackHandler;
 import com.codemastersTournament.PersonnelManagerBot.controller.sender.SubmittingAdditionalMessage;
 import com.codemastersTournament.PersonnelManagerBot.models.Employee;
 import com.codemastersTournament.PersonnelManagerBot.service.impl.AnswerConsumerImpl;
@@ -8,7 +7,6 @@ import com.codemastersTournament.PersonnelManagerBot.service.impl.EmployeeServic
 import com.codemastersTournament.PersonnelManagerBot.utils.StateForEmployeeData;
 import com.codemastersTournament.PersonnelManagerBot.utils.enums.BotInputState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -19,15 +17,12 @@ public class AddNewEmployee implements Input {
     private final AnswerConsumerImpl answerConsumer;
     private final EmployeeService employeeService;
     private final SubmittingAdditionalMessage message;
-    private final CallbackHandler callbackHandler;
     @Autowired
     public AddNewEmployee(AnswerConsumerImpl answerConsumer, EmployeeService employeeService,
-                          SubmittingAdditionalMessage message,
-                          @Qualifier("openCardChooseCallback") CallbackHandler callbackHandler) {
+                          SubmittingAdditionalMessage message) {
         this.answerConsumer = answerConsumer;
         this.employeeService = employeeService;
         this.message = message;
-        this.callbackHandler = callbackHandler;
     }
     @Override
     public void handle(Update update) {
@@ -39,10 +34,12 @@ public class AddNewEmployee implements Input {
 
             Map.Entry<BotInputState, Employee> stateForEmployeeData = StateForEmployeeData.stateAndCard.entrySet().iterator().next();
             StateForEmployeeData.stateAndCard.put(stateForEmployeeData.getKey(),employee);
+
+            message.sendMessage(answerConsumer.sendPhoto(chatId, employee));
             message.sendMessage(answerConsumer.generateEmployCard(chatId,employee));
         }catch (Exception e){
             message.sendMessage(new SendMessage(chatId.toString(),"Введено не корректные данные.\nВведите как в примере!"));
-            message.sendMessage(answerConsumer.generateNewAddCommandMessage(chatId));
+            message.sendMessage(answerConsumer.generateAddCommandMessage(chatId));
         }
     }
 }

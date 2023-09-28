@@ -19,15 +19,12 @@ public class EditNameEmployee implements Input {
     private final AnswerConsumerImpl answerConsumer;
     private final EmployeeService employeeService;
     private final SubmittingAdditionalMessage message;
-    private final CallbackHandler callbackHandler;
     @Autowired
     public EditNameEmployee(AnswerConsumerImpl answerConsumer, EmployeeService employeeService,
-                                SubmittingAdditionalMessage message,
-                                @Qualifier("openCardChooseCallback") CallbackHandler callbackHandler) {
+                                SubmittingAdditionalMessage message) {
         this.answerConsumer = answerConsumer;
         this.employeeService = employeeService;
         this.message = message;
-        this.callbackHandler = callbackHandler;
     }
     @Override
     public void handle(Update update) {
@@ -42,7 +39,7 @@ public class EditNameEmployee implements Input {
     }
     private void sendCardAfterEdit(Long chatId, Long id) {
         Employee employeeAfterChanger = employeeService.searchEmployeeById(id);
-        message.sendMessage(answerConsumer.sendNewPhoto(chatId, employeeAfterChanger));
+        message.sendMessage(answerConsumer.sendPhoto(chatId, employeeAfterChanger));
         message.sendMessage(answerConsumer.generateEmployCard(chatId, employeeAfterChanger));
 
         StateForEmployeeData.stateAndCard.clear();

@@ -11,7 +11,7 @@ public class Consts {
             "Например: \n" +
             "Иванов Иван|дизайнер|магазин курток \n\n" +
             "Другие команды не обрабатываются❗\uFE0F❗\uFE0F❗\uFE0F";
-    public static final String TEXT_MESSAGE_SEARCH = "Введите имя и/или фамилию сотрудника (регистр не учитывается)\n\n" +
+    public static final String TEXT_MESSAGE_SEARCH_BY_FIO = "Введите имя и/или фамилию сотрудника (регистр не учитывается)\n\n" +
             "пример 1:\n" +
             "Иванов Иван \n\n" +
             "пример 2:\n" +
@@ -19,6 +19,17 @@ public class Consts {
             "пример 3:\n" +
             "Иван \n\n" +
             "Другие команды не обрабатываются❗\uFE0F❗\uFE0F❗\uFE0F";
+    public static final String TEXT_MESSAGE_SEARCH_BY_POSITION = "Введите должность сотрудника (регистр не учитывается)\n\n" +
+            "пример:\n" +
+            "директор";
+    public static final String TEXT_MESSAGE_SEARCH_BY_PROJECT = "Введите название проекта над которым работает сотрудника (регистр не учитывается)\n\n" +
+            "пример:\n" +
+            "телеграм бот";
+    public static final String TEXT_MESSAGE_SEARCH_BY_DATE = "Для поиск сотрудников, " +
+            "    пришедших \nв определенный период времени введите даты" +
+            ": с (dd.MM.yyyy) по (dd.MM.yyyy)\n\n" +
+            "пример:\n" +
+            "28.09.2023 - 30.09.2023";
     public static final String TEXT_MESSAGE_INFO = "Информация о боте: \n" +
             "1. Пользователи имеют возможность добавлять нового сотрудника, указав поля\n" +
             "     Фамилия, Имя, Должность, Проект.\n" +
@@ -35,4 +46,7 @@ public class Consts {
     public static final String CANT_UNDERSTAND = "Извините, я не понял, что вы имеете ввиду";
     public static final String UNKNOWN_TYPE_COMMAND = "Неподдерживаемый тип сообщения!";
     public static final String ERROR = "Внутренняя ошибка";
+    public static final String ERROR_PHOTO = "Фотографию можно отправить только в разделе \"Карточка сотрудника\" для изменения аватарки.";
+    public static final String ERROR_FILE ="Сообщения в виде файлов не обрабатываются! Если вы отправили фото," +
+            " то попробуйте перед тем как отправить сжать ее";
 }

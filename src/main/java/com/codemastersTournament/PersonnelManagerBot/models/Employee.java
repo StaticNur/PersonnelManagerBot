@@ -28,4 +28,7 @@ public class Employee {
     private byte[] avatar;
     @Column(name = "arrival_date")
     private Timestamp arrivalDate;
+    /*@ManyToOne
+    @JoinColumn(name = "fk_id",referencedColumnName = "id")
+    private Person owner;*/
 }

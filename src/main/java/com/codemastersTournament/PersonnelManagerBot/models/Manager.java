@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -27,5 +28,7 @@ public class Manager {
     private byte[] avatar;
     @Column(name = "arrival_date")
     private Timestamp arrivalDate;
+    /*@OneToMany(mappedBy = "owner",cascade = CascadeType.PERSIST)
+    private List<Book> books;*/
 
 }
