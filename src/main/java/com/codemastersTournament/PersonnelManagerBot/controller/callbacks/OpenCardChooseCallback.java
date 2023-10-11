@@ -21,7 +21,7 @@ public class OpenCardChooseCallback implements CallbackHandler{
     public void apply(Callback callback, Update update) {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         StateForEmployeeData.stateAndCard.clear();
-        StateForEmployeeData.stateAndCard.put(BotInputState.OPEN_CARD,new Employee());
+        StateForEmployeeData.stateAndCard.put(BotInputState.OPEN_CARD, new Employee());
 
         //return answerConsumer.generateNewSearchCommandMessage(chatId);
         message.sendMessage(answerConsumer.generateSearchByFIOMessage(chatId));

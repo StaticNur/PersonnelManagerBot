@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
@@ -69,7 +70,7 @@ public class EmployeeService {
     public List<Employee> searchEmployeeByProject(String project){
         return employeeRepository.findByProjectIgnoreCase(project.trim());
     }
-    public List<Employee> searchEmployeeByDate(String interval){
+    /*public List<Employee> searchEmployeeByDate(String interval){
         String[] twoDate = interval.trim().split("-");
         //SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -95,6 +96,30 @@ public class EmployeeService {
         Date to = date2;
 
         return employeeRepository.findByArrivalDateIsAfterAndArrivalDateIsBefore((Timestamp) from, (Timestamp) to);
+    }*/
+    public List<Employee> searchEmployeeByDate(String interval) {
+        String[] twoDate = interval.trim().split("-");
+
+        System.out.println(Arrays.asList(twoDate));
+        System.out.println(twoDate[0].trim());
+        System.out.println(twoDate[1].trim());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy"); // Формат даты
+        Date date1 = null;
+        Date date2 = null;
+
+        try {
+            date1 = sdf.parse(twoDate[0].trim());
+            date2 = sdf.parse(twoDate[1].trim());
+
+            System.out.println(date1);
+            System.out.println(date2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return employeeRepository.findByArrivalDateIsAfterAndArrivalDateIsBefore(
+                new Timestamp(date1.getTime()), new Timestamp(date2.getTime()));
     }
     public List<Employee> viewAll(){
         return employeeRepository.findAll();

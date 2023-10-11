@@ -5,6 +5,8 @@ import com.codemastersTournament.PersonnelManagerBot.repository.EmployeeReposito
 import com.codemastersTournament.PersonnelManagerBot.service.AnswerConsumer;
 import com.codemastersTournament.PersonnelManagerBot.utils.Consts;
 import com.codemastersTournament.PersonnelManagerBot.utils.StateForEmployeeData;
+import com.codemastersTournament.PersonnelManagerBot.utils.enums.BotInputState;
+import com.codemastersTournament.PersonnelManagerBot.utils.enums.ButtonCallBackQuery;
 import com.codemastersTournament.PersonnelManagerBot.utils.enums.Role;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
         rowsInLine.add(generateButtonVertical("Добавить сотрудника ✅", "ADD_EMPLOYEE"));
         rowsInLine.add(generateButtonVertical("Открыть карточку сотрудника ✍\uFE0F", "OPEN_CARD_EMPLOYEE"));
-        rowsInLine.add(generateButtonVertical("Поиск сотрудника по ФИО \uD83D\uDD0D", "SEARCH_EMPLOYEE"));
+        rowsInLine.add(generateButtonVertical("Поиск сотрудника по ФИО \uD83D\uDD0D", "SEARCH_EMPLOYEE_BY_FIO"));
         rowsInLine.add(generateButtonVertical("Все сотрудники \uD83D\uDC40", "VIEW_ALL"));
         markupInLine.setKeyboard(rowsInLine);
         return markupInLine;

@@ -52,7 +52,6 @@ public class CallbacksHandler {
         this.callbacks.put(ButtonCallBackQuery.CHANGE_POSITION, changePositionChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.CHANGE_PROJECT, changeProjectChooseCallback);
         this.callbacks.put(ButtonCallBackQuery.CHANGE_AVATAR, avatarChooseCallback);
-
     }
     public void handleCallbacks(Update update) {
         String dataCallback = update.getCallbackQuery().getData();
